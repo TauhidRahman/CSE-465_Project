@@ -147,6 +147,24 @@ plt.xlabel('Year')
 plt.ylabel('Suicides number')
 plt.show()
 
+# rearranging the columns 
+
+data = data[['country', 'year', 'gender', 'age', 'population', 'suicides']]
+data.head(0)
+
+# Removing the country Column
+
+data = data.drop(['country'], axis = 1)
+data.head(0)
+
+#splitting the data into dependent and independent variables
+
+x = data.iloc[:,:-1]
+y = data.iloc[:,-1]
+
+print(x.shape)
+print(y.shape)
+
 # splitting the dataset into training and testing sets
 
 from sklearn.model_selection import train_test_split
@@ -170,31 +188,110 @@ mm = MinMaxScaler()
 x_train = mm.fit_transform(x_train)
 x_test = mm.transform(x_test)
 
-# Lineer Regression
+# using principal component analysis
+
+from sklearn.decomposition import PCA
+
+# creating a principal component analysis model
+#pca = PCA(n_components = None)
+
+# feeding the independent variables to the PCA model
+#x_train = pca.fit_transform(x_train)
+#x_test = pca.transform(x_test)
+
+# visualising the principal components that will explain the highest share of variance
+#explained_variance = pca.explained_variance_ratio_
+#print(explained_variance)
+
+# creating a principal component analysis model
+#pca = PCA(n_components = 1)
+
+# feeding the independent variables to the PCA model
+#x_train = pca.fit_transform(x_train)
+#x_test = pca.transform(x_test)
+
+# applying k means clustering
+
+# selecting the best choice for no. of clusters
+from sklearn.cluster import KMeans
+
+wcss = []
+for i in range(1, 11):
+  km = KMeans(n_clusters = i, init = 'k-means++', max_iter = 300, n_init = 10, random_state = 0)
+  km.fit(x_train)
+  wcss.append(km.inertia_)
+  
+plt.plot(range(1, 11), wcss)
+plt.title('The Elbow Method')
+plt.xlabel('no. of clusters')
+plt.ylabel('WCSS')
+plt.show()
+
+# applying kmeans with 4 clusters
+
+km = KMeans(n_clusters = 4, init = 'k-means++', max_iter = 300, n_init = 10, random_state = 0)
+y_means = km.fit_predict(x_train)
+
+# visualising the clusters
+
+plt.scatter(x_train[y_means == 0, 0], x_train[y_means == 0, 1], s = 100, c = 'pink', label = 'cluster 1')
+plt.scatter(x_train[y_means == 1, 0], x_train[y_means == 1, 1], s = 100, c = 'cyan', label = 'cluster 2')
+plt.scatter(x_train[y_means == 2, 0], x_train[y_means == 2, 1], s = 100, c = 'magenta', label = 'cluster 3')
+plt.scatter(x_train[y_means == 3, 0], x_train[y_means == 3, 1], s = 100, c = 'violet', label = 'cluster 4')
+
+plt.scatter(km.cluster_centers_[:,0], km.cluster_centers_[:,1], s = 100, c = 'red', label = 'centroids')
+
+plt.title('Cluster of Clients')
+plt.xlabel('cc')
+plt.show()
+
 from sklearn.linear_model import LinearRegression
-reg = LinearRegression()
-predict_space = np.linspace(min(x), max(x)).reshape(-1,1)  # Prediction Space
-#print(predict_space)
-lis = ['female', 'male']
-lis2 = ['5-14 years', '15-24 years', '25-34 years', '35-54 years', '55-74 years', '75+ years']
-for i in lis:
-    for k in lis2:
-        data_1 = data[data['gender'] == i]
-        data_sex = data_1[data_1['age'] == k ]
-        x_sex = np.array(data_sex.loc[:,'year']).reshape(-1,1)
-        y_sex = np.array(data_sex.loc[:,'suicides']).reshape(-1,1)
-        reg.fit(x_sex,y_sex)                                               # Fit
-        predicted = reg.predict(predict_space)                     # Prediction
-        print( i, k, 'R^2 Score: ', reg.score(x_sex,y_sex))                       # R^2 calculation
-        # print(i)
-        #plt.figure(figsize = [9,6])
-        #print(i,k)
-        plt.plot(predict_space, predicted, color = 'black', linewidth = 2)
-        plt.scatter(x_sex,y_sex)
-        plt.title('Scatter Plot')
-        plt.xlabel('Year')
-        plt.ylabel('Suicides number')
-        plt.show()
+from sklearn.metrics import r2_score
+
+# creating the model
+model = LinearRegression()
+
+# feeding the training data into the model
+model.fit(x_train, y_train)
+
+# predicting the test set results
+y_pred = model.predict(x_test)
+
+# calculating the mean squared error
+mse = np.mean((y_test - y_pred)**2)
+print("MSE :", mse)
+
+# calculating the root mean squared error
+rmse = np.sqrt(mse)
+print("RMSE :", rmse)
+
+#calculating the r2 score
+r2 = r2_score(y_test, y_pred)
+print("r2_score :", r2)
+
+from sklearn.svm import SVR
+
+# creating the model
+model = SVR()
+
+# feeding the training data into the model
+model.fit(x_train, y_train)
+
+# predicting the test set results
+y_pred = model.predict(x_test)
+
+# calculating the mean squared error
+mse = np.mean((y_test - y_pred)**2)
+print("MSE :", mse)
+
+# calculating the root mean squared error
+rmse = np.sqrt(mse)
+print("RMSE :", rmse)
+
+#calculating the r2 score
+r2 = r2_score(y_test, y_pred)
+print("r2_score :", r2)
+
 
 
 
