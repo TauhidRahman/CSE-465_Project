@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+**Installing the Libraries**
+"""
+
 import numpy as np
 import pandas as pd
 
@@ -7,7 +10,8 @@ import seaborn as sns
 
 """**Importing the Dataset**"""
 
-data = pd.read_csv('dataset on suicide rates.csv')
+data = pd.read_csv('suicide.csv')
+
 data = data.sort_values(['year'], ascending = True)
 
 print(data.shape)
@@ -23,7 +27,6 @@ f, ax = plt.subplots(figsize = (4, 3))
 corr = data.corr()
 sns.heatmap(corr, mask = np.zeros_like(corr, dtype = np.bool), 
             cmap = sns.diverging_palette(3, 3, as_cmap = True), square = True, ax = ax)
-
 
 # renaming the columns
 
@@ -128,24 +131,15 @@ data['suicides'].sum()
 Avg_sui = data['suicides'].mean()
 print(Avg_sui)
 
-#splitting the data into dependent and independent variables
+# Imputing the NaN values from the population column
 
-x = data.iloc[:,:-1]
-y = data.iloc[:,-1]
+data['population'] = data['population'].fillna(data['population'].median())
+data['population'].isnull().any()
 
-print(x.shape)
-print(y.shape)
+# Imputing the values suicides no column
 
-# plotter
-
-x = np.array(data.loc[:,'year']).reshape(-1,1)
-y = np.array(data.loc[:,'suicides']).reshape(-1,1)
-#Scatter Plot
-plt.figure(figsize = [10,10])
-plt.scatter(x=x,y=y,)
-plt.xlabel('Year')
-plt.ylabel('Suicides number')
-plt.show()
+data['suicides'] = data['suicides'].fillna(0)
+data['suicides'].isnull().any()
 
 # rearranging the columns 
 
@@ -292,6 +286,97 @@ print("RMSE :", rmse)
 r2 = r2_score(y_test, y_pred)
 print("r2_score :", r2)
 
+from sklearn.ensemble import RandomForestRegressor
+
+# creating the model
+model = RandomForestRegressor()
+
+# feeding the training data into the model
+model.fit(x_train, y_train)
+
+# predicting the test set results
+y_pred = model.predict(x_test)
+
+# calculating the mean squared error
+mse = np.mean((y_test - y_pred)**2)
+print("MSE :", mse)
+
+# calculating the root mean squared error
+rmse = np.sqrt(mse)
+print("RMSE :", rmse)
+
+#calculating the r2 score
+r2 = r2_score(y_test, y_pred)
+print("r2_score :", r2)
+
+from sklearn.tree import DecisionTreeRegressor
+
+# creating the model
+model = DecisionTreeRegressor()
+
+# feeding the training data into the model
+model.fit(x_train, y_train)
+
+# predicting the test set results
+y_pred = model.predict(x_test)
+
+# calculating the mean squared error
+mse = np.mean((y_test - y_pred)**2)
+print("MSE :", mse)
+
+# calculating the root mean squared error
+rmse = np.sqrt(mse)
+print("RMSE :", rmse)
+
+#calculating the r2 score
+r2 = r2_score(y_test, y_pred)
+print("r2_score :", r2)
+
+from sklearn.ensemble import AdaBoostRegressor
+
+# creating the model
+model = AdaBoostRegressor()
+
+# feeding the training data into the model
+model.fit(x_train, y_train)
+
+# predicting the test set results
+y_pred = model.predict(x_test)
+
+# calculating the mean squared error
+mse = np.mean((y_test - y_pred)**2)
+print("MSE :", mse)
+
+# calculating the root mean squared error
+rmse = np.sqrt(mse)
+print("RMSE :", rmse)
+
+#calculating the r2 score
+r2 = r2_score(y_test, y_pred)
+print("r2_score :", r2)
+
+from sklearn.neural_network import MLPClassifier
+
+# creating the model
+model = MLPClassifier(hidden_layer_sizes = 100, max_iter = 50 )
+
+# feeding the training data into the model
+model.fit(x_train, y_train)
+
+# predicting the test set results
+y_pred = model.predict(x_test)
+
+# calculating the mean squared error
+mse = np.mean((y_test - y_pred)**2)
+print("MSE :", mse)
+
+# calculating the root mean squared error
+rmse = np.sqrt(mse)
+print("RMSE :", rmse)
+
+#calculating the r2 score
+r2 = r2_score(y_test, y_pred)
+print("r2_score :", r2)
 
 
 
